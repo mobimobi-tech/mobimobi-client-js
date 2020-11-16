@@ -3,9 +3,8 @@ import { Api } from '../Api';
 import {
   IRecommendationBaseParams,
   IRecommendationBaseData,
-  IRecommendationBasketParams,
-  IRecommendationSimilarParams,
-  IRecommendationZonedParams,
+  IRecommendationMostPopularParams,
+  IRecommendationRecentlyViewedParams,
 } from './interfaces';
 
 export class Recommendations {
@@ -15,66 +14,56 @@ export class Recommendations {
     this.apiClient = apiClient;
   }
 
-  public getBaseRecommendations(params: IRecommendationBaseParams): Promise<IRecommendationBaseData> {
-    const { user_id: userId, num, brands } = params;
+  public getPersonalizedRecommendations(params: IRecommendationBaseParams): Promise<IRecommendationBaseData> {
+    const url = Object.keys(params)
+      .map((key) => `${key}=${params[key]}`)
+      .join('&');
 
-    let url = `?user_id=${userId}`;
-
-    if (num) {
-      url += `&num=${num}`;
-    }
-
-    if (brands) {
-      url += `&brands=${brands.join(',')}`;
-    }
-
-    return this.apiClient.makeRequest(`/recommendations${url}`);
+    return this.apiClient.makeRequest(`/recommendations/products/personalized?${url}`);
   }
 
-  public getBasketRecommendations(params: IRecommendationBasketParams): Promise<IRecommendationBaseData> {
-    const { user_id: userId, num } = params;
+  public getMostPopularRecommendations(params: IRecommendationMostPopularParams): Promise<IRecommendationBaseData> {
+    const url = Object.keys(params)
+      .map((key) => `${key}=${params[key]}`)
+      .join('&');
 
-    let url = `?user_id=${userId}`;
-
-    if (num) {
-      url += `&num=${num}`;
-    }
-
-    return this.apiClient.makeRequest(`/recommendations/basket${url}`);
+    return this.apiClient.makeRequest(`/recommendations/products/most_popular?${url}`);
   }
 
-  public getSimilarRecommendations(params: IRecommendationSimilarParams): Promise<IRecommendationBaseData> {
-    const { user_id: userId, product_id: productId, same_brand: sameBrand, num, brands } = params;
+  public getBasketRecommendations(params: IRecommendationBaseParams): Promise<IRecommendationBaseData> {
+    const url = Object.keys(params)
+      .map((key) => `${key}=${params[key]}`)
+      .join('&');
 
-    let url = `?user_id=${userId}&product_id=${productId}`;
+    return this.apiClient.makeRequest(`/recommendations/products/basket?${url}`);
+  }
 
-    if (num) {
-      url += `&num=${num}`;
-    }
+  public getSimilarRecommendations(params: IRecommendationBaseParams): Promise<IRecommendationBaseData> {
+    const url = Object.keys(params)
+      .map((key) => `${key}=${params[key]}`)
+      .join('&');
 
-    if (brands) {
-      url += `&brands=${brands.join(',')}`;
-    }
-
-    if (sameBrand) {
-      url += `&brands=${sameBrand}`;
-    }
-
-    return this.apiClient.makeRequest(`/recommendations/similar${url}`, {
+    return this.apiClient.makeRequest(`/recommendations/products/similar?${url}`, {
       body: JSON.stringify(params),
     });
   }
 
-  public getZonedRecommendations(params: IRecommendationZonedParams): Promise<IRecommendationBaseData> {
-    const { user_id: userId, zone_id: zoneId, num } = params;
+  public getZonedRecommendations(params: IRecommendationBaseParams): Promise<IRecommendationBaseData> {
+    const url = Object.keys(params)
+      .map((key) => `${key}=${params[key]}`)
+      .join('&');
 
-    let url = `?user_id=${userId}&zone_id=${zoneId}`;
+    return this.apiClient.makeRequest(`/recommendations/products/zoned?${url}`, {
+      body: JSON.stringify(params),
+    });
+  }
 
-    if (num) {
-      url += `&num=${num}`;
-    }
+  public getRecentlyViewedRecommendations(params: IRecommendationRecentlyViewedParams): Promise<IRecommendationBaseData> {
+    const url = Object.keys(params)
+      .map((key) => `${key}=${params[key]}`)
+      .join('&');
 
-    return this.apiClient.makeRequest(`/recommendations/zoned${url}`, {
+    return this.apiClient.makeRequest(`/recommendations/products/recently_viewed?${url}`, {
       body: JSON.stringify(params),
     });
   }

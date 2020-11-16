@@ -29,4 +29,8 @@ export class User {
       method: 'DELETE',
     });
   }
+
+  public getStatusUserAPI(): Promise<IUserEventRemoveResponse> {
+    return this.apiClient.makeRequest('/user/status');
+  }
 }
