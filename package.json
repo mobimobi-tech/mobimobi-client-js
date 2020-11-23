@@ -1,6 +1,6 @@
 {
   "name": "mobimobi-client-js",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Client for mobimobi API",
   "main": "dist/mobimobi-client-js.modern.js",
   "umd:main": "mobimobi-client-js.umd.js",
