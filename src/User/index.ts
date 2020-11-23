@@ -30,7 +30,7 @@ export class User {
     });
   }
 
-  public getStatusUserAPI(): Promise<IUserEventRemoveResponse> {
+  public getStatus(): Promise<IUserEventRemoveResponse> {
     return this.apiClient.makeRequest('/user/status');
   }
 }

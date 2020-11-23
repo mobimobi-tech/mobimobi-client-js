@@ -21,7 +21,7 @@ export class Metrics {
     return this.apiClient.makeRequest(`/metrics/${urlParams}`);
   }
 
-  public getMetricsAPIStatus(): Promise<{ status: string }> {
+  public getStatus(): Promise<{ status: string }> {
     return this.apiClient.makeRequest('/metrics/status');
   }
 }

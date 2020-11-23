@@ -17,7 +17,7 @@ export class Search {
     return this.apiClient.makeRequest(`/search?${url}`);
   }
 
-  public getSearchAPIStatus(): Promise<{ status: string }> {
+  public getStatus(): Promise<{ status: string }> {
     return this.apiClient.makeRequest('/search/status');
   }
 }
