@@ -10,7 +10,7 @@ The best way to integrate Mobimobi within your JavaScript project
 
 ---
 
-# Installation
+## Installation
 
 Install client package with npm
 
@@ -23,8 +23,6 @@ or with yarn
 ```bash
 yarn add mobimobi-client-js
 ```
-
----
 
 ## Usage
 
@@ -41,19 +39,13 @@ mobiClient.catalog.getStatus().then((response) => {
 }).catch((err) => console.error(err));
 ```
 
----
-
 ## Usage examples
 
 https://codesandbox.io/s/mobi-mobi-js-client-examples-1gf0j
 
----
-
 ## Docs [WIP]
 
 [See docs](https://github.com/mobimobi-tech/mobimobi-client-js/blob/master/docs/docs_openapi_mobi-api-v2-en.yaml) for more details and API.
-
----
 
 ## Troubleshooting
 
