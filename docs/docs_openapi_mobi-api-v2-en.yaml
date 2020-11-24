@@ -1,0 +1,1179 @@
+openapi: 3.0.3
+info:
+  title: Mobimobi.tech API
+  description: |
+    For Russian version, please click [here](http://docs.mobimobi.tech/api/docs-v2-ru.html).
+
+    This technical documentation was created for Mobimobi.tech company clients.
+    If you are not a client yet, then you can be one.
+    To get more information about the product, please go to our [main website](https://en.mobimobi.tech):
+
+    # Introduction
+
+    Congratulations!
+
+    You are now a client of a personalized recommendation service (Mobimobi.tech). This means that in the short-term
+    lifetime you will significantly increase your business records by using better user-targeting.
+
+    Aside the fact that it is simple to integrate our service into your product, this documentation is created
+    in order to assist your engineering team with the integration process. Simply follow the instructions
+    and recommendations from this document for easier and faster integration process. Do not hesitate to reach out
+    to our specialists should there be any questions. We will be glad to support you. Please note that to get
+    access to our service, you need to get a special "token" and use it as described in the next section.
+
+    Thank you for trusting us at Mobimobi.tech.
+
+    # Migration From the Previous API Version
+
+    In case you used the previous version of the API (v1), to migrate to the new one, you need to:
+
+    ## Use HTTPS Protocol only
+
+    Although HTTP requests are usually redirected to the corresponding HTTPS endpoints, HTTP endpoints will be disabled
+    in near future.
+
+    ## Update Authorization Settings
+
+    In API v2 the only way to pass authorization information to the server is to use `Authorization` HTTP header.
+
+    ## Use New Endpoints
+
+    We replaced old endpoints with the new ones:
+
+    | v1                                                            | v2                                        |
+    |---------------------------------------------------------------|-------------------------------------------|
+    | POST /event/product                                           | POST /catalog/products                    |
+    | GET /event/product/{ProductId}                                | GET /catalog/products/{product_id}        |
+    | DELETE /event/product                                         | DELETE /catalog/products/{product_id}     |
+    | POST /event/event                                             | POST /user/events                         |
+    | GET /recommendation/{UserId}/recommendations                  | GET /recommendation/products/personalized |
+    | GET /recommendation/{UserId}/basket_recommendations           | GET /recommendation/products/basket       |
+    | GET /recommendation/user/{UserId}/product/{ProductId}/similar | GET /recommendation/products/similar      |
+    | GET /user/{UserId}/recommendations/zone/{ZoneId}              | GET /recommendation/products/zoned        |
+
+  contact:
+    name: Mobimobi.tech support
+    email: support@mobimobi.tech
+  version: v2
+servers:
+  - url: https://api.mobimobi.tech/v2
+paths:
+  /catalog/products:
+    post:
+      tags:
+        - Catalog API
+      summary: Create/Replace product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateOne'
+              # oneOf:
+              #   - $ref: '#/components/schemas/ProductCreateOne'
+              #   - $ref: '#/components/schemas/ProductCreateMany'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /catalog/products/{product_id}:
+    parameters:
+      - $ref: '#/components/parameters/product_id_path'
+    get:
+      tags:
+        - Catalog API
+      summary: Get product
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadOne'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+    patch:
+      tags:
+        - Catalog API
+      summary: Update product properties
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+    delete:
+      tags:
+        - Catalog API
+      summary: Delete one product
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /catalog/all_products:
+    delete:
+      tags:
+        - Catalog API
+      summary: Delete all products
+      description: Works for test tokens only
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /catalog/status:
+    get:
+      tags:
+        - Catalog API
+      summary: Get Catalog API status
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '500':
+          $ref: '#/components/responses/500'
+  /user/events:
+    post:
+      tags:
+        - User API
+      summary: Create user event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserEvent'
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /user/all_events:
+    delete:
+      tags:
+        - User API
+      summary: Delete all user events
+      description: Workds for test tokens only
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /user/status:
+    get:
+      tags:
+        - User API
+      summary: Get User API status
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '500':
+          $ref: '#/components/responses/500'
+  /search:
+    get:
+      tags:
+        - Search API
+      summary: Search for products
+      parameters:
+        - $ref: '#/components/parameters/search_query'
+        - $ref: '#/components/parameters/num'
+        - $ref: '#/components/parameters/user_id_optional'
+        - $ref: '#/components/parameters/brands'
+        - $ref: '#/components/parameters/full_product_info'
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSearchResultMany'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /search/status:
+    get:
+      tags:
+        - Search API
+      summary: Get Search API status
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '500':
+          $ref: '#/components/responses/500'
+  /recommendation/products/personalized:
+    get:
+      tags:
+        - Recommendations API
+      summary: Get persinalized recommendations
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/num'
+        - $ref: '#/components/parameters/brands'
+        - $ref: '#/components/parameters/categories'
+        - $ref: '#/components/parameters/full_product_info'
+        - $ref: '#/components/parameters/complete_with_most_popular'
+        - $ref: '#/components/parameters/exclude_sold'
+        - $ref: '#/components/parameters/exclude_added_to_basket'
+        - $ref: '#/components/parameters/exclude_added_to_wishlist'
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadMany'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /recommendation/products/most_popular:
+    get:
+      tags:
+        - Recommendations API
+      summary: Get most popular products
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/num'
+        - $ref: '#/components/parameters/brands'
+        - $ref: '#/components/parameters/categories'
+        - $ref: '#/components/parameters/full_product_info'
+        - $ref: '#/components/parameters/exclude_sold'
+        - $ref: '#/components/parameters/exclude_added_to_basket'
+        - $ref: '#/components/parameters/exclude_added_to_wishlist'
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadMany'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /recommendation/products/basket:
+    get:
+      tags:
+        - Recommendations API
+      summary: Get "in-basket" recommendations
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/num'
+        - $ref: '#/components/parameters/product_ids'
+        - $ref: '#/components/parameters/complete_with_most_popular'
+        - $ref: '#/components/parameters/full_product_info'
+        - $ref: '#/components/parameters/exclude_sold'
+        - $ref: '#/components/parameters/exclude_added_to_basket'
+        - $ref: '#/components/parameters/exclude_added_to_wishlist'
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadMany'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /recommendation/products/similar:
+    get:
+      tags:
+        - Recommendations API
+      summary: Get similar products
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/product_id_query'
+        - $ref: '#/components/parameters/num'
+        - $ref: '#/components/parameters/same_brand'
+        - $ref: '#/components/parameters/brands'
+        - $ref: '#/components/parameters/categories'
+        - $ref: '#/components/parameters/full_product_info'
+        - $ref: '#/components/parameters/exclude_sold'
+        - $ref: '#/components/parameters/exclude_added_to_basket'
+        - $ref: '#/components/parameters/exclude_added_to_wishlist'
+        - $ref: '#/components/parameters/disable_user_product_history_features'
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadMany'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /recommendation/products/zoned:
+    get:
+      tags:
+        - Recommendations API
+      summary: Get zoned recommendations
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/zone_id'
+        - $ref: '#/components/parameters/num'
+        - $ref: '#/components/parameters/complete_with_most_popular'
+        - $ref: '#/components/parameters/full_product_info'
+        - $ref: '#/components/parameters/exclude_sold'
+        - $ref: '#/components/parameters/exclude_added_to_basket'
+        - $ref: '#/components/parameters/exclude_added_to_wishlist'
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadMany'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /recommendation/products/recently_viewed:
+    get:
+      tags:
+        - Recommendations API
+      summary: Get recently viewed products
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/num'
+        - $ref: '#/components/parameters/full_product_info'
+        - $ref: '#/components/parameters/exclude_sold'
+        - $ref: '#/components/parameters/exclude_added_to_basket'
+        - $ref: '#/components/parameters/exclude_added_to_wishlist'
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReadMany'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /recommendation/status:
+    get:
+      tags:
+        - Recommendations API
+      summary: Get Recommendations API Status
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '500':
+          $ref: '#/components/responses/500'
+  /metrics/{metric_names}:
+    get:
+      tags:
+        - Metrics API
+      summary: Retrieve metrics
+      parameters:
+        - name: metric_names
+          in: path
+          description: |
+            One or more metrics, separated by `,` symbol
+            Metric format: `<metric_name>[.<tag>.<tag_value>]*[:<alias>]?`
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              example:
+                - events
+                - events.action.create
+                - events.type.product_view.action.create:create_events
+            minItems: 1
+        - name: base
+          in: query
+          description: 'Metric base: (M)inute / (H)our / (D)ay'
+          schema:
+            type: string
+            enum:
+              - M
+              - H
+              - D
+        - name: from
+          in: query
+          required: true
+          description: |
+            Defines, from what date to return metrics. Supported formats:
+            * `%Y-%m-%d %H:%M:%S` - absolute date
+            * -NUMBER{M|H|D} (example: `-2D`, `-10H`) - relative date
+          schema:
+            type: string
+            example:
+              - 2020-01-01 00:00:00
+              - -2D
+      responses:
+        '200':
+          description: Request successfully processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metrics:
+                    type: array
+                    items:
+                      type: string
+                      example: events.action.create
+                  now_ts:
+                    type: integer
+                    example: 1577306759
+                  now:
+                    type: string
+                    example: '2019-12-25 20:45:59'
+                  from_ts:
+                    type: integer
+                    example: 1577293961
+                  from:
+                    type: string
+                    example: '2019-12-25 17:12:41'
+                  points:
+                    type: integer
+                    example: 4
+                  base:
+                    type: integer
+                    enum:
+                      - 60
+                      - 3600
+                      - 86400
+                    example: 3600
+                  values:
+                    type: object
+                    description: |
+                      Eash array item consists of the next two elements:
+                      1. Date, corresponding to the point
+                      2. Metric value
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: array
+                        items:
+                          oneOf:
+                            - type: string
+                            - type: integer
+                        minItems: 2
+                        maxItems: 2
+                    example:
+                      'events.action.create':
+                        - ['2020-04-24 00:00:00', 42]
+                        - ['2020-04-25 00:00:00', 43]
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - Token: []
+  /metrics/status:
+    get:
+      tags:
+        - Metrics API
+      summary: Get Metrics API status
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyOK'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        product_id:
+          description: Unique product identifier
+          type: string
+          example: Red T-Shirt XL
+          maxLength: 100
+        product_group_id:
+          description: |
+            Unique identifier of the product's group. Useful in case there are a few items in the inventory that
+            correspond to the same product, but have different sizes and/or colors.
+          type: string
+          example: T-Shirt
+          maxLength: 100
+        title:
+          description: Product title
+          type: string
+          example: Red T-Shirt
+          maxLength: 150
+        brand:
+          description: Product brand
+          type: string
+          example: My company
+          maxLength: 100
+        price:
+          description: Product price
+          type: string
+          pattern: '^[0-9]+\.[0-9]{2,2}$'
+          example: '12.00'
+          maxLength: 20
+        currency:
+          description: Product currency. Should be a valid ISO-4217 string
+          type: string
+          maxLength: 10
+          example: 'USD'
+        is_searchable:
+          description: |
+            Tells if a product can be added to a search index. If set to False, the product
+            will not show in the search results
+          type: boolean
+          example: true
+          default: true
+        is_recommendable:
+          description: |
+            Tells if a product is recommendable. If set to False, the product will not be added to the list of
+            recommended products
+          type: boolean
+          example: true
+          default: true
+        categories:
+          description: Product categories
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          maxItems: 10
+          minItems: 0
+          example:
+            - Cosmetics
+            - Perfume
+        color:
+          description: Product color
+          type: string
+          maxLength: 200
+          example: Red
+        size:
+          description: Product size
+          type: string
+          maxLength: 200
+          example: X-Large
+        available_from:
+          description: |
+            Sets a date (UTC) when a product becomes available for users. Until that date, the product
+            will not be returned as a recommendation, nor as a search result
+          type: string
+          pattern: '^[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}\:[0-9]{2}\:[0-9]{2}$'
+          example: '2020-05-12 14:12:42'
+        available_until:
+          description: |
+            Sets a date (UTC) when a product becomes unavailable for users. After that date the product
+            will no longer be returned as a recommendation, nor as a search result
+          type: string
+          pattern: '^[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}\:[0-9]{2}\:[0-9]{2}$'
+          example: '2021-05-12 14:12:42'
+        description:
+          description: Product description
+          type: string
+          example: 'Some cool description'
+          maxLength: 5000
+        sale_price:
+          description: Defines the amount the product is sold for when available for sale
+          type: string
+          pattern: '^[0-9]+\.[0-9]{2,2}$'
+          example: "9.99"
+          maxLength: 20
+        on_sale_from:
+          description: UTC date defines the start of a sale period for the product
+          type: string
+          pattern: '^[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}\:[0-9]{2}\:[0-9]{2}$'
+          example: '2021-05-12 14:12:42'
+        on_sale_until:
+          description: UTC date defines the end of a sale period for the product
+          type: string
+          pattern: '^[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}\:[0-9]{2}\:[0-9]{2}$'
+          example: '2021-05-12 23:59:59'
+        tags:
+          description: List of product tags
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          maxItems: 10
+          minItems: 0
+          example:
+            - exclusive
+            - face
+        age_group:
+          description: Age category of a product
+          type: string
+          enum:
+            - all_ages
+            - adult
+            - teen
+            - kids
+            - newborn
+          example: 'adult'
+          default: all_ages
+        gender:
+          description: Gender category of a product
+          type: string
+          enum:
+            - female
+            - male
+            - unisex
+          default: unisex
+    ProductCreateOne:
+      allOf:
+        - $ref: '#/components/schemas/Product'
+        - type: object
+          required:
+            - product_id
+            - title
+            - brand
+            - price
+            - currency
+#    ProductCreateMany:
+#      type: array
+#      items:
+#        $ref: '#/components/schemas/ProductCreateOne'
+    ProductReadOne:
+      allOf:
+        - $ref: '#/components/schemas/Product'
+        - type: object
+          required:
+            - id
+            - title
+            - brand
+    ProductReadMany:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductReadOne'
+    ProductSearchResultOne:
+      type: object
+      required:
+        - meta
+        - product
+      properties:
+        meta:
+          type: object
+        product:
+          $ref: '#/components/schemas/ProductReadOne'
+    ProductSearchResultMany:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductSearchResultOne'
+    UserEvent:
+      type: object
+      required:
+        - user_id
+        - event_type
+        - event_platform
+      properties:
+        user_id:
+          type: string
+          description: Unique users identifier
+          example: USER8833
+          maxLength: 100
+        event_type:
+          type: string
+          description: Event type
+          enum:
+            - PRODUCT_VIEW
+            - PRODUCT_TO_WISHLIST
+            - PRODUCT_TO_BASKET
+            - PRODUCT_SALE
+          example: PRODUCT_VIEW
+        event_platform:
+          type: string
+          description: Platform where an event happened
+          enum:
+            - IOS
+            - ANDROID
+            - WEB
+            - OTHER
+          example: ANDROID
+        product_id:
+          type: string
+          description: Unique product identifier. Has to be set for the following events only `PRODUCT_VIEW`, `PROUCT_TO_WISHLIST` и `PRODUCT_TO_BASKET`
+          example: SKU-5599
+          maxLength: 100
+        product_quantity:
+          type: integer
+          description: Number of products. Has to be set for `PRODUCT_TO_BASKET` events only
+          minimum: 1
+          maximum: 1000000
+        basket_items:
+          type: array
+          description: List of products. Has to be set for the `PRODUCT_SALE` events only
+          items:
+            type: object
+            required:
+              - product_id
+              - product_quantity
+            properties:
+              product_id:
+                type: string
+                description: Unique identifier of a product
+                maxLength: 100
+              product_quantity:
+                type: integer
+                description: Products quantity
+                minimum: 1
+                maximum: 1000000
+          maxItems: 1000
+          minItems: 1
+          example:
+            - product_id: "SKU-5599"
+              product_quantity: 2
+            - product_id: "SKU-9449"
+              product_quantity: 6
+        date:
+          type: string
+          description: 'UTC-datetime of the event. Expected format: `%Y-%m-%d %H:%M:%S`. Default value - Current UTC-time'
+          example: "2020-05-12 14:12:42"
+    EmptyOK:
+      type: object
+      properties:
+        status:
+          type: string
+          example: OK
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ERROR
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 400
+            description:
+              type: string
+              example: Can not parse request body.
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ERROR
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 401
+            description:
+              type: string
+              example: No token provided.
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ERROR
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 403
+            description:
+              type: string
+              example: Token is expired.
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ERROR
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 404
+            description:
+              type: string
+              example: Can not find an object.
+    InternalError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ERROR
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 500
+            description:
+              type: string
+              example: Unexpected internal error happened. We have already started digging into the problem.
+  responses:
+    'EmptyOK':
+      description: Request successfully processed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EmptyOK'
+    '400':
+      description: Bad request format or missing data and/or request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: Token is missing or can not be read
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '403':
+      description: Method can not be executed with the provided token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+    '404':
+      description: Object not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+    '500':
+      description: Unexpected internal error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalError'
+  parameters:
+    user_id:
+      name: user_id
+      in: query
+      description: Unique user identifier
+      required: true
+      schema:
+        type: string
+        example: USER8234
+    user_id_optional:
+      name: user_id
+      in: query
+      description: (Optional) Unique user identifier
+      required: false
+      schema:
+        type: string
+        example: USER8234
+    product_id_path:
+      name: product_id
+      in: path
+      description: Unique product identifier
+      required: true
+      schema:
+        type: string
+        example: SKU-145837
+    product_id_query:
+      name: product_id
+      in: query
+      description: Unique product identifier
+      required: true
+      schema:
+        type: string
+        example: SKU-145837
+    product_ids:
+      name: product_ids
+      in: query
+      description: List of unique product identifiers
+      schema:
+        type: array
+        collectionFormat: multi
+        items:
+          type: string
+        example:
+          - SKU-145837
+          - SKU-7676
+    zone_id:
+      name: zone_id
+      in: query
+      description: Unique zone identifier
+      required: true
+      schema:
+        type: string
+        example: similar-products-zone
+    num:
+      name: num
+      in: query
+      description: A number of elements that have to be be returned
+      schema:
+        type: integer
+        default: 10
+        example: 10
+    same_brand:
+      name: same_brand
+      in: query
+      description: Tells system to return products of the same brand only
+      schema:
+        type: string
+        enum:
+          - yes
+          - no
+        default: no
+    brands:
+      name: brands
+      in: query
+      description: Tells system to return products of the provided brands only
+      schema:
+        type: array
+        collectionFormat: multi
+        items:
+          type: string
+        example:
+          - Some brand
+          - Some other brand
+    categories:
+      name: categories
+      in: query
+      description: Tells system to return products of the given categories only
+      schema:
+        type: array
+        collectionFormat: multi
+        items:
+          type: string
+        example:
+          - Some category
+          - Some other category
+    search_query:
+      name: q
+      in: query
+      description: Search query string
+      schema:
+        type: string
+        example: Red T-Shirt
+    full_product_info:
+      name: full_product_info
+      in: query
+      description: Tells system to return full product information - this will add system fields to the response
+      schema:
+        type: string
+        enum:
+          - yes
+          - no
+        default: no
+    complete_with_most_popular:
+      name: complete_with_most_popular
+      in: query
+      description: Tells system to append results with most popular products in case system was not able to
+        find requestet number of products
+      schema:
+        type: string
+        enum:
+          - yes
+          - no
+        default: yes
+    exclude_sold:
+      name: exclude_sold
+      in: query
+      description: Tells system to exclude previously purchased products from results
+      schema:
+        type: string
+        enum:
+          - yes
+          - no
+        default: yes
+    exclude_added_to_basket:
+      name: exclude_added_to_basket
+      in: query
+      description: Tells system to exclude products that were previously purchased from results
+      schema:
+        type: string
+        enum:
+          - yes
+          - no
+        default: no
+    exclude_added_to_wishlist:
+      name: exclude_added_to_wishlist
+      in: query
+      description: Tells system to exclude products that were previously added to basket from results
+      schema:
+        type: string
+        enum:
+          - yes
+          - no
+        default: no
+    disable_user_product_history_features:
+      name: disable_user_product_history_features
+      in: query
+      description: |
+        Tells system not to use historical user-products interaction data while still using brand-level data.
+        If this flag is set, previously visited products might be added to recommendation results.
+        So, please use this flag only if you want to view not just "similar" products, but recommended ones too.
+      schema:
+        type: string
+        enum:
+          - yes
+          - no
+        default: yes
+  securitySchemes:
+    Token:
+      type: http
+      scheme: bearer
+      description: |
+        Token is a special character set that plays the role of a secret key known by the client only.
+        Our APIs use this key to determine a client that sent a request. Thus, every request to APIs has
+        to have this key. This can be done by adding "Authorization" header to your requests. Format:
+
+        ```
+        Authorization: Bearer <token>
+        ```
+
+        ## Your token
+
+        It is likely that you already have a token provided to you by one of Mobimobi.tech employees. If this is not
+        the case or you are not sure if your token is correct - please contact us and we will be happy to assist.
+
+        ## A test token
+
+        In order to be able to access our APIS not just from the product environment but also from the test one,
+        we provide our clients an additional "test" token which can and should be used for all requests not related
+        to production. In the situation where the same token is used by production and test environment, quality of
+        service might go down.
+tags:
+  - name: Catalog API
+    description: |
+      Catalog API allows clients to upload / modify information about products they have in their inventory. This
+      information is required in order to build Machine Learning Models that will be used to build recommendations.
+  - name: User API
+    description: |
+      A history of past events is something that makes every user unique and helps us to build the machine learning
+      model that will eventually help you to build personalized recommendations for your users. Apart from events, we
+      also use information about products you have in your catalog, like color, categories, etc. This allows us to
+      build even better model.
+
+      User API is a service built to enable you to send all the necessary data to us. This data will not
+      only be used to build a machine learning model, but will also be used to provide you with a number of metrics that
+      will help you to get a better understanding of how things work. These metrics can be accessed in our
+      [Web Console](https://console.mobimobi.tech)
+  - name: Search API
+    description: |
+      Search API allows you to build personalized machine learning-empowered search results page in your web application
+      or website.
+  - name: Recommendations API
+    description: |
+      Recommendation API is a service that allows our clients to get personalized recommendations generated on a flag
+      by leveraging user browsing history and the current context.
+  - name: Metrics API
+    description: |
+      Metrics API allows clients to retrieve a lot of different information on user events / historical recommendations
+      / attributed events / and many others. Most of the information is available in our
+      [Web Console](https://console.mobimobi.tech), but if clients want to inject metrics into their own applications
+      then they can use these API methods.
