@@ -6,16 +6,20 @@ export enum EEventType {
   'PRODUCT_SALE',
 }
 
+export interface IBasketItem {
+  product_id: string;
+  product_quantity: number;
+}
+
 export interface IUserEvent {
   user_id: string;
   event_type: EEventType;
   event_platform: string;
   product_id: string;
   product_quantity: number;
-  basket_items: string[];
+  basket_items: IBasketItem[];
   date: string;
 }
-
 export interface IUserEventAddResponse {
   status: string;
 }

@@ -58,7 +58,9 @@ export class Recommendations {
     });
   }
 
-  public getRecentlyViewedRecommendations(params: IRecommendationRecentlyViewedParams): Promise<IRecommendationBaseData> {
+  public getRecentlyViewedRecommendations(
+    params: IRecommendationRecentlyViewedParams
+  ): Promise<IRecommendationBaseData> {
     const url = Object.keys(params)
       .map((key) => `${key}=${params[key]}`)
       .join('&');

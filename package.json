@@ -1,6 +1,6 @@
 {
   "name": "mobimobi-client-js",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Client for mobimobi API",
   "main": "dist/mobimobi-client-js.modern.js",
   "umd:main": "mobimobi-client-js.umd.js",
@@ -9,7 +9,9 @@
     "dist",
     "readme.md"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "isomorphic-fetch": "^3.0.0"
+  },
   "devDependencies": {
     "@types/jest": "^26.0.14",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
